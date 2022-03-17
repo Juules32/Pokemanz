@@ -8,7 +8,7 @@ import pygame, json, sys, math
 from pygame.locals import *
 
 from Classes.saving import *
-from areas.areas import *
+from Classes.areas import *
 
 TILE_SIZE = 16
 SCALE_FACTOR = 4
