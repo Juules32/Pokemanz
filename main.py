@@ -15,6 +15,7 @@ SCALE_FACTOR = 4
 TILE_SCALE = TILE_SIZE * SCALE_FACTOR
 WALKING_SPEED = 2
 RATIO = 1.5
+MINIMUM_DISPLAY_SIZE = [9 * TILE_SCALE, 6 * TILE_SCALE]
 
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -30,6 +31,9 @@ dirt = pygame.image.load("assets/images/Dirt.png")
 grass = pygame.image.load("assets/images/Grass.png")
 player = pygame.image.load("assets/images/Player.png")
 
+plains_background = pygame.image.load("areas/plains/plains_background.png")
+plains_collision = pygame.image.load("areas/plains/plains_collision.png")
+
 tiles = [dirt, grass, dirt, grass, dirt, grass]
 
 def get_screen_center(dimensions):
@@ -38,11 +42,16 @@ def get_screen_center(dimensions):
 def find_tiles_avaliable (dimensions):
     x = round(dimensions[0]/TILE_SCALE)
     y = round(dimensions[1]/TILE_SCALE)
-    if x < y*1.5:
-        y = round(x/1.5)
-    else:
-        x = round(y*1.5)
     return (x, y)
+
+def size_check (dimensions):
+    w = dimensions[0]
+    h = dimensions[1]
+    if dimensions[0] < MINIMUM_DISPLAY_SIZE[0]:
+        w = MINIMUM_DISPLAY_SIZE[0]
+    if dimensions[1] < MINIMUM_DISPLAY_SIZE[1]:
+        h = MINIMUM_DISPLAY_SIZE[1]    
+    return (w, h)
 
 xy = find_tiles_avaliable(current_screen_dimensions)
 screen_center = get_screen_center(xy)
@@ -61,8 +70,11 @@ left_momentum, right_momentum, up_momentum, down_momentum = False, False, False,
 latest_direction = ""
 current_directions = []
 
+stored_size = [15, 10]
+
 
 current_area = plains
+
 
 font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -74,18 +86,28 @@ def run_1_tile(direction):
         run_queue.append(direction)
         x += 1
 
+
+
 #game loop
 while True:
     #event handling
     for event in pygame.event.get():
+        print(event)
         if event.type == KEYDOWN:
             if event.key == K_f:
+                
                 fullscreen = not fullscreen
                 if fullscreen:
-                    current_screen_dimensions = [screen.get_width(), screen.get_height()]
+                    stored_size = current_screen_dimensions
+                    xy = find_tiles_avaliable(monitor_size)
                     screen = pygame.display.set_mode(monitor_size, pygame.FULLSCREEN)
                 else:
-                    screen = pygame.display.set_mode(current_screen_dimensions, pygame.RESIZABLE)
+                    screen = pygame.display.set_mode(stored_size, pygame.RESIZABLE)
+
+                current_screen_dimensions = (xy[0]*TILE_SCALE, xy[1]*TILE_SCALE)
+                screen_center = get_screen_center(xy)
+                background_surface = pygame.Surface((current_screen_dimensions[0]/SCALE_FACTOR, current_screen_dimensions[1]/SCALE_FACTOR))
+                
             if event.key == K_a or event.key == K_d or event.key == K_w or event.key == K_s:
                 moving = True
                 if event.key == K_a:
@@ -113,10 +135,11 @@ while True:
 
         if event.type == VIDEORESIZE:
             if not fullscreen:
-                new_size = find_tiles_avaliable((event.w, event.h))
-                screen = pygame.display.set_mode((new_size[0]*TILE_SCALE, new_size[1]*TILE_SCALE), pygame.RESIZABLE)
-                current_screen_dimensions = (new_size[0]*TILE_SCALE, new_size[1]*TILE_SCALE)
+                current_screen_dimensions = (event.w, event.h)
+                current_screen_dimensions = size_check(current_screen_dimensions)
+                stored_size = current_screen_dimensions
                 xy = find_tiles_avaliable(current_screen_dimensions)
+                screen = pygame.display.set_mode(current_screen_dimensions, pygame.RESIZABLE)
                 screen_center = get_screen_center(xy)
                 background_surface = pygame.Surface((current_screen_dimensions[0]/SCALE_FACTOR, current_screen_dimensions[1]/SCALE_FACTOR))
 
@@ -164,6 +187,9 @@ while True:
                 background_surface.blit(tiles[tile], (x*TILE_SIZE + rounded_offset[0] + (screen_center[0] - current_area.x*TILE_SIZE), y*TILE_SIZE + rounded_offset[1] + (screen_center[1] - current_area.y*TILE_SIZE)))
                 x += 1
             y += 1
+
+    background_surface.blit(plains_background,  (rounded_offset[0] + screen_center[0] - current_area.x*TILE_SIZE, rounded_offset[1] + screen_center[1] - current_area.y*TILE_SIZE))
+    background_surface.blit(plains_collision,  (rounded_offset[0] + screen_center[0] - current_area.x*TILE_SIZE, rounded_offset[1] + screen_center[1] - current_area.y*TILE_SIZE))
     background_surface.blit(player, screen_center)
 
 
