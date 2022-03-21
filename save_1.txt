@@ -1,1 +1,1 @@
-{"x": 10, "y": 20, "location": ""}
+{"location": "plains", "position": [16, 0], "money": 500, "collected_items": [["pokeball", "plains", 4, 3], ["ocean", 3, 3]]}

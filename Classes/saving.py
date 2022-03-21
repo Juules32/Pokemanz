@@ -3,16 +3,17 @@ from tokenize import String
 
 class Save:
     def __init__(self):
-        self.x = 10
-        self.y = 20
-        self.location = ""
+        self.location = "plains"
+        self.x = 3
+        self.y = 10
+        self.inventory = {
+            "pokeballs": [],
+            "healing": [],
+            "tms": [],
+            "key_items": []
+        }
+        
 
 
 # if save_X.location = None then display unused save file
-save_data = [
-    Save(),
-    Save(),
-    Save(),
-    Save(),
-    Save(),
-]
+save_data = Save()

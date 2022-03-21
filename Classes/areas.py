@@ -10,7 +10,6 @@ class Map:
         self.h = len(self.collision_map)
 
         self.default_spawn = self.get_default_spawn()
-        self.x, self.y = self.default_spawn
         self.previous_location = previous_location
 
     def get_collision_map (self):
