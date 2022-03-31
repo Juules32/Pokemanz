@@ -1,3 +1,4 @@
+
 import pygame, json
 from Classes.npc import *
 
@@ -16,6 +17,7 @@ class Map:
         self.previous_location = previous_location
         self.background_sprite = pygame.image.load(f"Areas/{name}/background.png")
         self.foreground_sprite = pygame.image.load(f"Areas/{name}/foreground.png")
+        self.npc_map = self.get_npc_map()
         self.npcs = self.get_npcs()
 
     def get_collision_map (self):
@@ -35,22 +37,25 @@ class Map:
                     return [row.index(3), y]
             except:
                 y += 1
-    
-    def get_npcs(self):
+
+    def get_npc_map(self):
         with open(f"Areas/{self.name}/npcs.txt", "r") as file:
             data = json.load(file)
-            x = 0
-            for row in data:
-                y = 0
-                for tile in row:
-                    if tile != None:
-                        data[x][y] = npc(tile)
-
-                        
-
         return data
+    
+    def get_npcs(self):
+        data = self.get_npc_map()
+        found_npcs = []
+        x = 0
+        for row in data:
+            y = 0
+            for tile in row:
+                if tile != None:
+                    found_npcs.append([tile, x, y])
+                y += 1
+            x += 1
+        return found_npcs
     
     
 plains = Map("plains")
 
-print(plains.get_npcs())

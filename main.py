@@ -36,8 +36,12 @@ screen = pygame.display.set_mode((15*TILE_SCALE, 10*TILE_SCALE), pygame.RESIZABL
 current_screen_dims = pygame.display.get_surface().get_size()
 sprite_surface = pygame.Surface((current_screen_dims[0]/SCALE_FACTOR, current_screen_dims[1]/SCALE_FACTOR))
 
+
 #image loading
-player_image = pygame.image.load("Assets/player.png")
+people = {
+    "player": pygame.image.load("Assets/player.png"),
+    "sailor1": pygame.image.load("Assets/sailor1.png")
+}
 
 def get_screen_center(dims):
     return ((dims[0]/2 - 0.5)*TILE_SIZE, (dims[1]/2 - 0.5)*TILE_SIZE)
@@ -87,6 +91,8 @@ with open(f"Save Data/save_{1}.txt") as save:
     for key, value in data.items():
         setattr(current_player_data, key, value)
 save.close()
+
+current_area = plains
 
 #game loop
 while True:
@@ -160,9 +166,12 @@ while True:
 
     #rendering
     sprite_surface.fill((20,20,20))
-    sprite_surface.blit(plains.background_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
-    sprite_surface.blit(plains.foreground_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
-    sprite_surface.blit(player_image, screen_center)
+    sprite_surface.blit(current_area.background_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
+    sprite_surface.blit(current_area.foreground_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
+    sprite_surface.blit(current_area.foreground_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
+    for npc in current_area.npcs:
+        sprite_surface.blit(people[npc[0]], (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE + npc[1]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE + npc[2]*TILE_SIZE))
+    sprite_surface.blit(people["player"], screen_center)
 
     sprite_surface_scaled = pygame.transform.scale(sprite_surface, current_screen_dims)
     screen.blit(sprite_surface_scaled, (0,0))
