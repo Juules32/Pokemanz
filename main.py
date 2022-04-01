@@ -12,6 +12,7 @@
 #imports
 from asyncio.windows_events import NULL
 from ctypes import sizeof
+from turtle import pos
 import pygame, json, sys
 from pygame.locals import *
 from Classes.areas import *
@@ -36,11 +37,31 @@ screen = pygame.display.set_mode((15*TILE_SCALE, 10*TILE_SCALE), pygame.RESIZABL
 current_screen_dims = pygame.display.get_surface().get_size()
 sprite_surface = pygame.Surface((current_screen_dims[0]/SCALE_FACTOR, current_screen_dims[1]/SCALE_FACTOR))
 
+trans = {
+    (-1,0): "left",
+    (1,0): "right",
+    (0,-1): "up",
+    (0,1): "down"
+}
 
 #image loading
 people = {
-    "player": pygame.image.load("Assets/player.png"),
     "sailor1": pygame.image.load("Assets/sailor1.png")
+}
+
+player_sprite = {
+    "left_0": pygame.image.load("Assets/left_0.png"),
+    "left_1": pygame.image.load("Assets/left_1.png"),
+    "left_2": pygame.image.load("Assets/left_2.png"),
+    "right_0": pygame.image.load("Assets/right_0.png"),
+    "right_1": pygame.image.load("Assets/right_1.png"),
+    "right_2": pygame.image.load("Assets/right_2.png"),
+    "up_0": pygame.image.load("Assets/up_0.png"),
+    "up_1": pygame.image.load("Assets/up_1.png"),
+    "up_2": pygame.image.load("Assets/up_2.png"),
+    "down_0": pygame.image.load("Assets/down_0.png"),
+    "down_1": pygame.image.load("Assets/down_1.png"),
+    "down_2": pygame.image.load("Assets/down_2.png")
 }
 
 def get_screen_center(dims):
@@ -94,6 +115,11 @@ save.close()
 
 current_area = plains
 
+total_offset = 0
+count = 0
+stance = 0
+
+
 #game loop
 while True:
     #event handling
@@ -145,37 +171,61 @@ while True:
             pygame.quit()
             sys.exit()
 
+
     #checking if player can move
     if len(current_dirs):
         dir = current_dirs[-1]
+        wants_to_go = [current_player_data.pos[0] + dir[0], current_player_data.pos[1] + dir[1]]
+        if wants_to_go[0] < current_area.w and wants_to_go[0] >= 0 and wants_to_go[1] < current_area.h and wants_to_go[1] >= 0:
+            if current_area.collision_map[wants_to_go[1]][wants_to_go[0]] == 0:
+                if not len(run_queue):
+                    run_1_tile(dir)
+                # never two steps from 1 input and never more than two in queue
+                elif dir not in run_queue and len(run_queue) <= 16:
+                    run_1_tile(dir)
+            else:
+                current_player_data.facing = trans[dir]
+        else:
+            current_player_data.facing = trans[dir]
 
-        if not len(run_queue):
-            run_1_tile(dir)
-            
-        elif dir not in run_queue:
-            run_1_tile(dir)
+
     
+
     #animation
     if len(run_queue):
         dir = run_queue[0]
-        pos_offset[0] -= dir[0] * WALKING_SPEED
-        pos_offset[1] -= dir[1] * WALKING_SPEED
+        current_player_data.facing = trans[dir]
+        pos_offset[0] += dir[0] * WALKING_SPEED
+        pos_offset[1] += dir[1] * WALKING_SPEED
+        length = len(run_queue)
+        if length % TILE_SIZE == 0:
+            count += 1
+            stance = count % 2 + 1
+        elif length % TILE_SIZE == 8:
+            stance = 0
+
+
+
         run_queue = run_queue[WALKING_SPEED:]
+
+    else:
         
-    rounded_offset = [int(pos_offset[0]), int(pos_offset[1])]
+        count = 0
+        stance = 0
+
+    total_offset = (-pos_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, -pos_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE)
 
     #rendering
     sprite_surface.fill((20,20,20))
-    sprite_surface.blit(current_area.background_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
-    sprite_surface.blit(current_area.foreground_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
-    sprite_surface.blit(current_area.foreground_sprite, (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE))
+    sprite_surface.blit(current_area.background_sprite, total_offset)
+    sprite_surface.blit(current_area.foreground_sprite, total_offset)
     for npc in current_area.npcs:
-        sprite_surface.blit(people[npc[0]], (rounded_offset[0] + screen_center[0] - player.pos[0]*TILE_SIZE + npc[1]*TILE_SIZE, rounded_offset[1] + screen_center[1] - player.pos[1]*TILE_SIZE + npc[2]*TILE_SIZE))
-    sprite_surface.blit(people["player"], screen_center)
+        sprite_surface.blit(people[npc[0]], (total_offset[0] + npc[1]*TILE_SIZE, total_offset[1] + npc[2]*TILE_SIZE))
+    sprite_surface.blit(player_sprite[f"{current_player_data.facing}_{stance}"], screen_center)
 
     sprite_surface_scaled = pygame.transform.scale(sprite_surface, current_screen_dims)
     screen.blit(sprite_surface_scaled, (0,0))
-    text = font.render(f"{round(mainClock.get_fps())}, {current_dirs}, {pos_offset}, ", True, (0,0,100), (100,0,0))
+    text = font.render(f"{round(mainClock.get_fps())}, {current_player_data.get_pointing()}, ", True, (0,0,100), (100,0,0))
     screen.blit(text, (0,0))
 
     pygame.display.update()

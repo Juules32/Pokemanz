@@ -39,7 +39,7 @@ class Map:
                 y += 1
 
     def get_npc_map(self):
-        with open(f"Areas/{self.name}/npcs.txt", "r") as file:
+        with open(f"Areas/{self.name}/objects.txt", "r") as file:
             data = json.load(file)
         return data
     
