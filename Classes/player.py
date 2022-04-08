@@ -1,31 +1,27 @@
 from Classes.areas import *
 
-trans = {
-    (-1,0): "left",
-    (1,0): "right",
-    (0,-1): "up",
-    (0,1): "down"
-}
-rights = {
-    "left": (-1,0),
-    "right": (1,0),
-    "up": (0,-1),
-    "down": (0,1)
-}
-
 class Player:
     def __init__(self):
         self.location = "plains"
         self.pos = plains.default_spawn
-        self.facing = "down"
+        self.facing = (0,0)
         self.inventory = {
             "pokeballs": [],
             "healing": [],
             "tms": [],
             "key_items": []
         }
+        self.run_queue = []
     def get_pointing(self):
-        return (self.pos[0] + rights[self.facing][0], self.pos[1] + rights[self.facing][1])
+        return (self.pos[0] + self.facing[0], self.pos[1] + self.facing[1])
+
+    def run_1_tile(self, dir):
+        x = 0
+        while x < TILE_SIZE:
+            self.run_queue.append(dir)
+            x += 1
+        self.pos[0] += dir[0]
+        self.pos[1] += dir[1]
+
 
 player = Player()
-current_player_data = Player()

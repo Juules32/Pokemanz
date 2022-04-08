@@ -1,3 +1,4 @@
+from displays import *
 
 class Npc:
     def __init__(self, id):
@@ -5,4 +6,15 @@ class Npc:
         self.text = self.get_text()
 
     def get_text(self):
-        return 2
+        file = open(f"Dialogue/{self.id}.txt", "r")
+        data = file.read().split("\n")
+        file.close()
+        return data
+    
+    def interact(self):
+        for line in self.text:
+            print("pee")
+
+npcs = {
+    "sailor1": Npc("sailor1")
+}
