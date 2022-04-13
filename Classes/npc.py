@@ -4,6 +4,7 @@ class Npc:
     def __init__(self, id):
         self.id = id
         self.text = self.get_text()
+        self.sprite = pygame.image.load(f"Assets/{self.id}.png")
 
     def get_text(self):
         file = open(f"Dialogue/{self.id}.txt", "r")
