@@ -1,0 +1,3 @@
+[
+    ["pokeball", "pokeballs", 8, 8]
+]

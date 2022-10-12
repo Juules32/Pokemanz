@@ -1,8 +1,6 @@
 # TODO:
 
 #imports
-from asyncio.windows_events import NULL
-from operator import index
 import pygame, json, sys
 
 #initializations
@@ -11,11 +9,24 @@ pygame.display.set_caption("Pokémanz!")
 mainClock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 32)
 
-from constants import *
-from displays import *
 from pygame.locals import *
-from Classes.areas import *
-from Classes.player import *
+from constants import *
+from Classes.displays import Screen
+from Classes.npc import Npc
+from Classes.item import Item, items
+from Classes.areas import Map
+from Classes.player import Player
+
+screen = Screen()
+
+plains = Map("plains")
+
+player = Player()
+
+
+npcs = {
+    "sailor1": Npc("sailor1")
+}
 
 #read save
 with open(f"Save Data/save_{1}.txt") as save:
@@ -114,9 +125,14 @@ while True:
         if player.wants_to_interact:
             player.wants_to_interact = False
             looking_at = player.get_pointing()
-            if isinstance(current_area.complete_collision[looking_at[1]][looking_at[0]], str):
-                npcs["sailor1"].interact()
+            object_looked_at = current_area.complete_collision[looking_at[1]][looking_at[0]]
+            if isinstance(object_looked_at, str):
+                if len(object_looked_at) == 3:
+                    npcs[object_looked_at].interact()
+                else:
+                    print(object_looked_at)
                 player.interacting = True
+            
         #checking if player can move
         if len(player.current_dirs):
             dir = player.current_dirs[-1]

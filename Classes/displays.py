@@ -33,4 +33,3 @@ class Screen:
             h = min_display_size[1]    
         return (w, h)
 
-screen = Screen()

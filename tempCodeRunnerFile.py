@@ -1,1 +1,1 @@
-interacting
+setattr(player, key, value)

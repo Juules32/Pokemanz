@@ -1,6 +1,7 @@
-from displays import *
+import pygame
 
 class Npc:
+    
     def __init__(self, id):
         self.id = id
         self.text = self.get_text()
@@ -14,8 +15,5 @@ class Npc:
     
     def interact(self):
         for line in self.text:
-            print("pee")
+            print(line)
 
-npcs = {
-    "sailor1": Npc("sailor1")
-}

@@ -1,6 +1,4 @@
-
 import pygame, json, copy
-from Classes.npc import *
 
 class Map:
 
@@ -18,6 +16,7 @@ class Map:
         self.background_sprite = pygame.image.load(f"Areas/{name}/background.png")
         self.foreground_sprite = pygame.image.load(f"Areas/{name}/foreground.png")
         self.npcs = self.get_npcs()
+        self.items = self.get_items()
         self.complete_collision = self.get_complete_collision()
 
     
@@ -49,8 +48,10 @@ class Map:
         return map
     
     def get_npcs(self):
-        return json.load(open(f"Areas/{self.name}/objects.txt", "r"))
+        return json.load(open(f"Areas/{self.name}/npcs.txt", "r"))
+
+    def get_items(self):
+        return json.load(open(f"Areas/{self.name}/items.txt", "r"))
     
     
-plains = Map("plains")
 

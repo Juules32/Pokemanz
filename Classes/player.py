@@ -1,9 +1,10 @@
-from Classes.areas import *
+import pygame
+from constants import *
 
 class Player:
     def __init__(self):
         self.location = "plains"
-        self.pos = plains.default_spawn
+        self.pos = (2,2)
         self.facing = (0,0)
         self.inventory = {
             "pokeballs": [],
@@ -45,6 +46,3 @@ class Player:
             x += 1
         self.pos[0] += dir[0]
         self.pos[1] += dir[1]
-
-
-player = Player()

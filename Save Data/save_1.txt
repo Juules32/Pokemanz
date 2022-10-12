@@ -1,1 +1,1 @@
-{"location": "plains", "pos": [12, 3], "facing": [0, -1], "inventory": {"pokeballs": [], "healing": [], "tms": [], "key_items": []}}
+{"location": "plains", "pos": [8, 4], "facing": [0, 1], "inventory": {"pokeballs": [], "healing": [], "tms": [], "key_items": []}}
