@@ -1,11 +1,15 @@
 import pygame
 from constants import *
 
-class Player:
-    def __init__(self):
-        self.location = "plains"
-        self.pos = (2,2)
-        self.facing = (0,0)
+class Person:
+    def __init__(self, location, pos, facing):
+        self.location = location
+        self.pos = pos
+        self.facing = facing
+
+class Player(Person):
+    def __init__(self, location, pos, facing):
+        super().__init__(location, pos, facing)
         self.inventory = {
             "pokeballs": [],
             "healing": [],
@@ -40,9 +44,28 @@ class Player:
         return (self.pos[0] + self.facing[0], self.pos[1] + self.facing[1])
 
     def run_1_tile(self, dir):
-        x = 0
-        while x < TILE_SIZE:
+        for i in range(0,16):
             self.run_queue.append(dir)
-            x += 1
+
         self.pos[0] += dir[0]
         self.pos[1] += dir[1]
+
+class Npc(Person):
+    def __init__(self, location, pos, facing, id):
+        super().__init__(location, pos, facing)
+        self.id = id
+        self.text = self.get_text()
+        self.sprite = pygame.image.load(f"Assets/{self.id}.png")
+
+    def get_text(self):
+        file = open(f"Dialogue/{self.id}.txt", "r")
+        data = file.read().split("\n")
+        file.close()
+        return data
+    
+    def interact(self):
+        for line in self.text:
+            print(line)
+
+class ImportantNpc(Npc):
+    pass

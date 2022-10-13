@@ -1,1 +1,1 @@
-setattr(player, key, value)
+3

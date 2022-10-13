@@ -1,4 +1,14 @@
-# TODO:
+# 
+# 
+# 
+# 
+# 
+# i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
+
+# Find en måde at lave dialogue system på. Jeg tænker at lave tekstbokse med fast størrelse over npcer, så formattering med scalende game window ikke er et problem
+
+# Genovervej, hvordan du vil strukturere maps
+# Implementér running
 
 #imports
 import pygame, json, sys
@@ -12,20 +22,16 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 from pygame.locals import *
 from constants import *
 from Classes.displays import Screen
-from Classes.npc import Npc
 from Classes.item import Item, items
 from Classes.areas import Map
-from Classes.player import Player
+from Classes.people import Player, Npc, ImportantNpc
 
 screen = Screen()
-
 plains = Map("plains")
-
-player = Player()
-
+player = Player("plains", (1,1), (0,0))
 
 npcs = {
-    "sailor1": Npc("sailor1")
+    "sailor1": Npc("plains", (1,1), (0,0), "sailor1")
 }
 
 #read save
@@ -69,15 +75,14 @@ while True:
                     player.latest_dir = (0, 1)
                 player.current_dirs.append(player.latest_dir)
         if event.type == KEYUP:
-            if event.key == K_a or event.key == K_d or event.key == K_w or event.key == K_s:
-                if event.key == K_a:
-                    player.current_dirs.pop(player.current_dirs.index((-1, 0)))
-                if event.key == K_d:
-                    player.current_dirs.pop(player.current_dirs.index((1, 0)))
-                if event.key == K_w:
-                    player.current_dirs.pop(player.current_dirs.index((0, -1)))
-                if event.key == K_s:
-                    player.current_dirs.pop(player.current_dirs.index((0, 1)))
+            if event.key == K_a:
+                player.current_dirs.pop(player.current_dirs.index((-1, 0)))
+            elif event.key == K_d:
+                player.current_dirs.pop(player.current_dirs.index((1, 0)))
+            elif event.key == K_w:
+                player.current_dirs.pop(player.current_dirs.index((0, -1)))
+            elif event.key == K_s:
+                player.current_dirs.pop(player.current_dirs.index((0, 1)))
         if event.type == VIDEORESIZE:
             if not screen.fullscreen:
                 screen.current_dims = screen.size_check((event.w, event.h))
@@ -142,7 +147,7 @@ while True:
                     if not len(player.run_queue):
                         player.run_1_tile(dir)
                     # never two steps from 1 input and never more than two in queue
-                    elif dir not in player.run_queue and len(player.run_queue) < 16:
+                    elif dir not in player.run_queue and len(player.run_queue) < TILE_SIZE:
                         player.run_1_tile(dir)
             if not len(player.run_queue):
                 player.facing = [dir[0], dir[1]]
