@@ -51,21 +51,20 @@ class Player(Person):
         self.pos[1] += dir[1]
 
 class Npc(Person):
-    def __init__(self, location, pos, facing, id):
+    def __init__(self, location, pos, facing, id, text):
         super().__init__(location, pos, facing)
         self.id = id
-        self.text = self.get_text()
-        self.sprite = pygame.image.load(f"Assets/{self.id}.png")
-
-    def get_text(self):
-        file = open(f"Dialogue/{self.id}.txt", "r")
-        data = file.read().split("\n")
-        file.close()
-        return data
+        self.text = text
+        self.sprite = pygame.image.load("Assets/" + self.id.split("_")[0] + ".png")
     
     def interact(self):
         for line in self.text:
             print(line)
+
+class Trainer(Npc):
+    def __init__(self, location, pos, facing, id):
+        super().__init__(location, pos, facing, id)
+
 
 class ImportantNpc(Npc):
     pass

@@ -1,7 +1,7 @@
 # 
 # 
 # 
-# 
+# gør så sailors siger deres unikke dialogue
 # 
 # i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
 
@@ -29,10 +29,6 @@ from Classes.people import Player, Npc, ImportantNpc
 screen = Screen()
 plains = Map("plains")
 player = Player("plains", (1,1), (0,0))
-
-npcs = {
-    "sailor1": Npc("plains", (1,1), (0,0), "sailor1")
-}
 
 #read save
 with open(f"Save Data/save_{1}.txt") as save:
@@ -130,12 +126,9 @@ while True:
         if player.wants_to_interact:
             player.wants_to_interact = False
             looking_at = player.get_pointing()
-            object_looked_at = current_area.complete_collision[looking_at[1]][looking_at[0]]
-            if isinstance(object_looked_at, str):
-                if len(object_looked_at) == 3:
-                    npcs[object_looked_at].interact()
-                else:
-                    print(object_looked_at)
+            object_looked_at = current_area.collision_map[looking_at[1]][looking_at[0]]
+            if isinstance(object_looked_at, object):
+                print(object_looked_at.text)
                 player.interacting = True
             
         #checking if player can move
@@ -143,7 +136,7 @@ while True:
             dir = player.current_dirs[-1]
             wants_to_go = [player.pos[0] + dir[0], player.pos[1] + dir[1]]
             if wants_to_go[0] < current_area.w and wants_to_go[0] >= 0 and wants_to_go[1] < current_area.h and wants_to_go[1] >= 0:
-                if current_area.complete_collision[wants_to_go[1]][wants_to_go[0]] == 0:
+                if current_area.collision_map[wants_to_go[1]][wants_to_go[0]] == 0:
                     if not len(player.run_queue):
                         player.run_1_tile(dir)
                     # never two steps from 1 input and never more than two in queue
@@ -158,7 +151,7 @@ while True:
         screen.sprite_surface.blit(current_area.background_sprite, screen.total_offset)
         screen.sprite_surface.blit(current_area.foreground_sprite, screen.total_offset)
         for npc in current_area.npcs:
-            screen.sprite_surface.blit(npcs[npc[0]].sprite, (screen.total_offset[0] + npc[1]*TILE_SIZE, screen.total_offset[1] + npc[2]*TILE_SIZE))
+            screen.sprite_surface.blit(npc.sprite, (screen.total_offset[0] + npc.pos[0]*TILE_SIZE, screen.total_offset[1] + npc.pos[1]*TILE_SIZE))
         screen.sprite_surface.blit(player.sprites[f"{player.facing}_{player.stance}"], screen.center)
         screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
         screen.mode.blit(screen.sprite_surface_scaled, (0,0))
