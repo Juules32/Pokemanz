@@ -1,21 +1,23 @@
 import pygame
 from constants import *
 
-class Person:
-    def __init__(self, location, pos, facing):
+class Entity:
+    def __init__(self, id, location, pos):
+        self.id = id
         self.location = location
         self.pos = pos
-        self.facing = facing
+        self.sprite = pygame.image.load("Assets/" + self.id.split("_")[0] + ".png")
 
-class Player(Person):
-    def __init__(self, location, pos, facing):
-        super().__init__(location, pos, facing)
+class Player(Entity):
+    def __init__(self, id, location, pos):
+        super().__init__(id, location, pos)
         self.inventory = {
             "pokeballs": [],
             "healing": [],
             "tms": [],
             "key_items": []
         }
+        self.facing = (0,0)
         self.run_queue = []
         self.latest_dir = None
         self.current_dirs = []
@@ -50,21 +52,41 @@ class Player(Person):
         self.pos[0] += dir[0]
         self.pos[1] += dir[1]
 
-class Npc(Person):
-    def __init__(self, location, pos, facing, id, text):
-        super().__init__(location, pos, facing)
-        self.id = id
+
+class Interactable(Entity):
+    def __init__(self, id, location, pos, text):
+        super().__init__(id, location, pos)
         self.text = text
-        self.sprite = pygame.image.load("Assets/" + self.id.split("_")[0] + ".png")
     
     def interact(self):
-        for line in self.text:
-            print(line)
+        print(self.text)  
+
+class Npc(Interactable):
+    def __init__(self, id, location, pos, facing, text):
+        super().__init__(id, location, pos, text)
+        self.facing = facing
 
 class Trainer(Npc):
-    def __init__(self, location, pos, facing, id):
-        super().__init__(location, pos, facing, id)
+    def __init__(self, id, location, pos, facing, text):
+        super().__init__(id, location, pos, facing, text)
 
+    def detect_vision(self):
+        pass
 
 class ImportantNpc(Npc):
     pass
+
+class Item(Interactable):
+    def __init__(self, id, location, pos, text, visible = True):
+        super().__init__(id, location, pos, text)
+        if not visible:
+            self.sprite
+
+    def pickup(self):
+        pass
+
+
+
+items = {
+    "pokeballs": ["pokeball", "great ball", "ultra ball"]
+}

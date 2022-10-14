@@ -1,13 +1,20 @@
-from Classes.people import Npc
+from Classes.entities import Npc
 
 all_npcs = [
-    Npc("plains", (5,5), (0,0), "sailor_1",
+    Npc("sailor_1", "plains", (5,5), (0,0),
 
     "Howdy!"
     
     ), 
-    Npc("plains", (2,2),(0,1), "sailor_2",
+    Npc("sailor_2", "plains", (2,2),(0,1),
 
     "Hello there, pal!"
 
-    )]
+    ),
+    
+    Npc("youngster_1", "plains", (7,2), (0,0),
+    
+    "Hello, fight my ratatta!"
+    
+    )
+    ]

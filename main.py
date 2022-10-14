@@ -1,7 +1,6 @@
 # 
 # 
 # 
-# gør så sailors siger deres unikke dialogue
 # 
 # i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
 
@@ -22,13 +21,12 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 from pygame.locals import *
 from constants import *
 from Classes.displays import Screen
-from Classes.item import Item, items
 from Classes.areas import Map
-from Classes.people import Player, Npc, ImportantNpc
+from Classes.entities import Player, Npc, ImportantNpc, Item
 
 screen = Screen()
 plains = Map("plains")
-player = Player("plains", (1,1), (0,0))
+player = Player("Player_1", "plains", (1,1))
 
 #read save
 with open(f"Save Data/save_{1}.txt") as save:
@@ -127,7 +125,7 @@ while True:
             player.wants_to_interact = False
             looking_at = player.get_pointing()
             object_looked_at = current_area.collision_map[looking_at[1]][looking_at[0]]
-            if isinstance(object_looked_at, object):
+            if not isinstance(object_looked_at, int):
                 print(object_looked_at.text)
                 player.interacting = True
             
@@ -153,7 +151,15 @@ while True:
         for npc in current_area.npcs:
             screen.sprite_surface.blit(npc.sprite, (screen.total_offset[0] + npc.pos[0]*TILE_SIZE, screen.total_offset[1] + npc.pos[1]*TILE_SIZE))
         screen.sprite_surface.blit(player.sprites[f"{player.facing}_{player.stance}"], screen.center)
+
+        text_box = pygame.image.load("Assets/text_box.png")
+
+        screen.sprite_surface.blit(text_box, (screen.center[0] - text_box.get_width()/2 + TILE_SIZE/2, screen.center[1]-3.5*TILE_SIZE))
         screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
+        word = pygame.image.load("Assets/Pp.png")
+        word_size = word.get_size()
+        word = pygame.transform.scale(word, (word_size[0]*2.5, word_size[1]*2.5))
+        screen.sprite_surface_scaled.blit(word, ((screen.current_dims[0]*0.3,screen.current_dims[1]*0.13)))
         screen.mode.blit(screen.sprite_surface_scaled, (0,0))
         text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}", True, (0,0,100), (100,0,0))
         screen.mode.blit(text, (0,0))
