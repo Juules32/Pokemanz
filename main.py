@@ -165,4 +165,4 @@ while True:
         screen.mode.blit(text, (0,0))
 
     pygame.display.update()
-    mainClock.tick(60)
+    mainClock.tick(FRAMERATE)
