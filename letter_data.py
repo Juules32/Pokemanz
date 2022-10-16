@@ -3,15 +3,15 @@ import pygame
 letters = {}
 
 for letter in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!' ":
-    a = letter.lower()
-    Aa = letter.upper()
-    if letter == a:
-        letters[letter] = pygame.image.load("Assets/" + a + ".png")
+    if letter.lower() == letter:
+        letters[letter] = pygame.image.load("Assets/" + letter.lower() + ".png")
     else:
-        letters[letter] = pygame.image.load("Assets/" + Aa + a + ".png")
+        letters[letter] = pygame.image.load("Assets/" + letter.upper() + letter.lower() + ".png")
+
+letters["?"] = pygame.image.load("Assets/question_mark.png")
+
 
 letter_lengths = {}
 
 for key, value in letters.items():
     letter_lengths[key] = value.get_size()
-

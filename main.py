@@ -1,19 +1,19 @@
 # 
 # 
 # 
-# 
+# lav * " og : i pixel art
 # i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
-
-# Find en måde at lave dialogue system på. Jeg tænker at lave tekstbokse med fast størrelse over npcer, så formattering med scalende game window ikke er et problem
-
 # Genovervej, hvordan du vil strukturere maps
 # Implementér running
 
-#imports
+#removes "Hello from the pygame community..." from terminal
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame, json, sys
 
 #initializations
 pygame.init()
+pygame.display.set_icon(pygame.image.load("Assets/icon.png"))
 pygame.display.set_caption("Pokémanz!")
 mainClock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 32)

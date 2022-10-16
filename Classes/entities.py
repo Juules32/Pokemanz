@@ -76,6 +76,8 @@ class Trainer(Npc):
 class ImportantNpc(Npc):
     pass
 
+    #def walk_route(start, *args, moves_area = False)
+
 class Item(Interactable):
     def __init__(self, id, location, pos, text, visible = True):
         super().__init__(id, location, pos, text)
