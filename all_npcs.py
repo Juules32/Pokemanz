@@ -16,5 +16,14 @@ all_npcs = [
     
     "Hello, fight my ratatta!"
     
-    )
-    ]
+    ),
+
+    Npc("coolkid_1", "plains", (4,4), (0,0),
+    
+    "I have superpowers..!"),
+
+    Npc("goku", "plains", (6,4), (0,0),
+    
+    "HYAAAAAAHHHH!!!")
+
+]

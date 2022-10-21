@@ -10,7 +10,6 @@ class Map:
         self.previous_location = previous_location
         self.background_sprite = pygame.image.load(f"Areas/{name}/background.png")
         self.foreground_sprite = pygame.image.load(f"Areas/{name}/foreground.png")
-        self.npcs = self.get_npcs()
         self.items = self.get_items()
         try:
             self.collision_map = self.get_collision_map()
@@ -29,8 +28,9 @@ class Map:
         collision_map = []
         for row in data:
             collision_map.append([int(x) for x in list(row)])
-        for npc in self.npcs:
-            collision_map[npc.pos[1]][npc.pos[0]] = npc
+        for npc in all_npcs:
+            if npc.location == self.name:
+                collision_map[npc.pos[1]][npc.pos[0]] = npc
         return collision_map
     
     def get_default_spawn(self):
@@ -42,18 +42,8 @@ class Map:
             except:
                 y += 1
 
-    
-    
-    def get_npcs(self):
-        area_npcs = []
-        for npc in list(all_npcs):
-            if(npc.location == self.name):
-                area_npcs.append(npc)
-        return area_npcs
-
     def get_items(self):
         return json.load(open(f"Areas/{self.name}/items.txt", "r"))
 
     
     
-

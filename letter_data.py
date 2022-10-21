@@ -2,13 +2,14 @@ import pygame
 
 letters = {}
 
-for letter in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!' ":
+for letter in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!'":
     if letter.lower() == letter:
-        letters[letter] = pygame.image.load("Assets/" + letter.lower() + ".png")
+        letters[letter] = pygame.image.load("Assets/Letters/" + letter.lower() + ".png")
     else:
-        letters[letter] = pygame.image.load("Assets/" + letter.upper() + letter.lower() + ".png")
+        letters[letter] = pygame.image.load("Assets/Letters/" + letter.upper() + letter.lower() + ".png")
 
-letters["?"] = pygame.image.load("Assets/question_mark.png")
+letters["?"] = pygame.image.load("Assets/Letters/question_mark.png")
+letters[" "] = pygame.image.load("Assets/Letters/_.png")
 
 
 letter_lengths = {}
