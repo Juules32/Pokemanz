@@ -7,6 +7,7 @@
 # Implementér running
 
 #removes "Hello from the pygame community..." from terminal
+from asyncio.windows_events import NULL
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame, json, sys
@@ -22,12 +23,12 @@ from pygame.locals import *
 from constants import *
 from Classes.displays import Screen
 from Classes.areas import Map
+from text import Text
 from Classes.entities import Player, Npc, ImportantNpc, Item, Entity
 
 screen = Screen()
 plains = Map("plains")
 player = Player("Player_1", "plains", (1,1))
-
 
 #read save
 with open(f"Save Data/save_{1}.txt") as save:
@@ -41,13 +42,18 @@ screen.pos_offset = [player.pos[0]*TILE_SIZE, player.pos[1]*TILE_SIZE]
 #current area
 current_area = plains
 
+a = None
+
+
 #game loop
 while True:
+    pressing = False
     #event handling
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_z:
                 player.wants_to_interact = True
+                pressing = True
             if event.key == K_f:
                 screen.fullscreen = not screen.fullscreen
                 if screen.fullscreen:
@@ -115,56 +121,59 @@ while True:
         player.count = 0
         player.stance = 0
 
-    if player.interacting:
+    #interacting false when all text has been clicked through
+    #work in progress. skal der laves ny text class hver gang? probably. 
 
-        #interacting false when all text has been clicked through
-        player.interacting = False
+    
 
-    else:
-        #checking if player wants to interact
-        if player.wants_to_interact:
-            player.wants_to_interact = False
-            looking_at = player.get_pointing()
-            object_looked_at = current_area.collision_map[looking_at[1]][looking_at[0]]
-            if not isinstance(object_looked_at, int):
-                print(object_looked_at.text)
-                player.interacting = True
-            
-        #checking if player can move
-        if len(player.current_dirs):
-            dir = player.current_dirs[-1]
-            wants_to_go = [player.pos[0] + dir[0], player.pos[1] + dir[1]]
-            if wants_to_go[0] < current_area.w and wants_to_go[0] >= 0 and wants_to_go[1] < current_area.h and wants_to_go[1] >= 0:
-                if current_area.collision_map[wants_to_go[1]][wants_to_go[0]] == 0:
-                    if not len(player.run_queue):
-                        player.run_1_tile(dir)
-                    # never two steps from 1 input and never more than two in queue
-                    elif dir not in player.run_queue and len(player.run_queue) < TILE_SIZE:
-                        player.run_1_tile(dir)
-            if not len(player.run_queue):
-                player.facing = [dir[0], dir[1]]
-            
-        #rendering
-        screen.total_offset = (-screen.pos_offset[0] + screen.center[0], -screen.pos_offset[1] + screen.center[1])
-        screen.sprite_surface.fill((20,20,20))
-        screen.sprite_surface.blit(current_area.background_sprite, screen.total_offset)
-        screen.sprite_surface.blit(current_area.foreground_sprite, screen.total_offset)
-        for i, row in enumerate(current_area.collision_map):
-            if i == player.pos[1]:
-                screen.sprite_surface.blit(player.sprites[f"{player.facing}_{player.stance}"], (screen.center[0], screen.center[1] - TILE_SIZE*0.5))
+    
+    
+        
+    #checking if player can move
+    if len(player.current_dirs):
+        dir = player.current_dirs[-1]
+        wants_to_go = [player.pos[0] + dir[0], player.pos[1] + dir[1]]
+        if wants_to_go[0] < current_area.w and wants_to_go[0] >= 0 and wants_to_go[1] < current_area.h and wants_to_go[1] >= 0:
+            if current_area.collision_map[wants_to_go[1]][wants_to_go[0]] == 0:
+                if not len(player.run_queue):
+                    player.run_1_tile(dir)
+                # never two steps from 1 input and never more than two in queue
+                elif dir not in player.run_queue and len(player.run_queue) < TILE_SIZE:
+                    player.run_1_tile(dir)
+        if not len(player.run_queue):
+            player.facing = [dir[0], dir[1]]
+        
+    #rendering
+    screen.total_offset = (-screen.pos_offset[0] + screen.center[0], -screen.pos_offset[1] + screen.center[1])
+    screen.sprite_surface.fill((20,20,20))
+    screen.sprite_surface.blit(current_area.background_sprite, screen.total_offset)
+    screen.sprite_surface.blit(current_area.foreground_sprite, screen.total_offset)
+    for i, row in enumerate(current_area.collision_map):
+        if i == player.pos[1]:
+            screen.sprite_surface.blit(player.sprites[f"{player.facing}_{player.stance}"], (screen.center[0], screen.center[1] - TILE_SIZE*0.5))
 
-            for item in row:
-                if not isinstance(item, int):
-                    screen.sprite_surface.blit(item.sprite, (screen.total_offset[0] + item.pos[0]*TILE_SIZE, screen.total_offset[1] + item.pos[1]*TILE_SIZE - TILE_SIZE*0.5))
-                
+        for item in row:
+            if not isinstance(item, int):
+                screen.sprite_surface.blit(item.sprite, (screen.total_offset[0] + item.pos[0]*TILE_SIZE, screen.total_offset[1] + item.pos[1]*TILE_SIZE - TILE_SIZE*0.5))
 
-        text_box = pygame.image.load("Assets/Dialogue/text_box.png")
 
-        screen.sprite_surface.blit(text_box, (screen.center[0] - text_box.get_width()/2 + TILE_SIZE/2, screen.center[1]-3.5*TILE_SIZE))
-        screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
-        screen.mode.blit(screen.sprite_surface_scaled, (0,0))
-        text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}", True, (0,0,100), (100,0,0))
-        screen.mode.blit(text, (0,0))
+    looking_at = player.get_pointing()
+    object_looked_at = current_area.collision_map[looking_at[1]][looking_at[0]]
+    if not isinstance(object_looked_at, int) and player.wants_to_interact:
+        player.wants_to_interact = False
+        player.interacting = True
+        a = Text(object_looked_at.text + object_looked_at.text + object_looked_at.text, screen.center[0] - 40 + TILE_SIZE/2 + player.facing[0]*TILE_SIZE, screen.center[1]-2.8*TILE_SIZE + player.facing[1]*TILE_SIZE + 20, screen.sprite_surface)
+
+
+
+    if a != None and player.interacting:
+        a.scroll(pressing, 20, 20)
+
+
+    screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
+    screen.mode.blit(screen.sprite_surface_scaled, (0,0))
+    text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}", True, (0,0,100), (100,0,0))
+    screen.mode.blit(text, (0,0))
 
     pygame.display.update()
     mainClock.tick(FRAMERATE)

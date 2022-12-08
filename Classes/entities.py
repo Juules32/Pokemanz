@@ -44,7 +44,7 @@ class Player(Entity):
         self.stance = 0
         self.wants_to_interact = False
         self.interacting = False
-    
+
     #used to find the tile player is looking at
     def get_pointing(self):
         return (self.pos[0] + self.facing[0], self.pos[1] + self.facing[1])
