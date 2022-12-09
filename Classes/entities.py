@@ -1,5 +1,6 @@
 import pygame
 from constants import *
+from text import Text
 
 
 #all objects visible somewhere on the world map
@@ -61,9 +62,23 @@ class Interactable(Entity):
     def __init__(self, id, location, pos, text):
         super().__init__(id, location, pos)
         self.text = text
+        self.dialogue = None
+        self.interacting = False
     
     def interact(self):
-        print(self.text)  
+        print(self.text)
+        if(self.dialogue == None):
+            print("starting dialogue")
+            self.dialogue = Text(self.text, self.pos[0]*TILE_SCALE, self.pos[1]*TILE_SCALE)
+            self.interacting = True
+        else:
+            if not self.dialogue.finished:
+                print("continuing dialogue")
+                self.dialogue.pressing = True
+            else:
+                print("finishing dialogue")
+                self.interacting = False
+                self.dialogue = None
 
 class Npc(Interactable):
     def __init__(self, id, location, pos, facing, text):

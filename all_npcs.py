@@ -22,6 +22,10 @@ all_npcs = [
     
     "I have superpowers..!"),
 
+    Npc("coolkid_2", "plains", (5,4), (0,0),
+    
+    "I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime"),
+
     Npc("goku", "plains", (6,4), (0,0),
     
     "HYAAAAAAHHHH!!!")

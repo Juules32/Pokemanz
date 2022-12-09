@@ -1,10 +1,10 @@
 # 
-# 
-# 
+# How to scale dialogue properly
+# How to end conversation (applies to real life as well) 
+# Implementér running
 # lav * " og : i pixel art
 # i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
 # Genovervej, hvordan du vil strukturere maps
-# Implementér running
 
 #removes "Hello from the pygame community..." from terminal
 from asyncio.windows_events import NULL
@@ -42,18 +42,17 @@ screen.pos_offset = [player.pos[0]*TILE_SIZE, player.pos[1]*TILE_SIZE]
 #current area
 current_area = plains
 
-a = None
 
 
 #game loop
 while True:
-    pressing = False
+    player.wants_to_interact = False
+
     #event handling
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_z:
                 player.wants_to_interact = True
-                pressing = True
             if event.key == K_f:
                 screen.fullscreen = not screen.fullscreen
                 if screen.fullscreen:
@@ -120,15 +119,7 @@ while True:
     else:
         player.count = 0
         player.stance = 0
-
-    #interacting false when all text has been clicked through
-    #work in progress. skal der laves ny text class hver gang? probably. 
-
     
-
-    
-    
-        
     #checking if player can move
     if len(player.current_dirs):
         dir = player.current_dirs[-1]
@@ -159,18 +150,21 @@ while True:
 
     looking_at = player.get_pointing()
     object_looked_at = current_area.collision_map[looking_at[1]][looking_at[0]]
+
+    #if player looking at interactible and z is pressed
     if not isinstance(object_looked_at, int) and player.wants_to_interact:
-        player.wants_to_interact = False
-        player.interacting = True
-        a = Text(object_looked_at.text + object_looked_at.text + object_looked_at.text, screen.center[0] - 40 + TILE_SIZE/2 + player.facing[0]*TILE_SIZE, screen.center[1]-2.8*TILE_SIZE + player.facing[1]*TILE_SIZE + 20, screen.sprite_surface)
-
-
-
-    if a != None and player.interacting:
-        a.scroll(pressing, 20, 20)
-
+        object_looked_at.interact()
+        object_looked_at.interacting = True
+    
+    
 
     screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
+
+    if not isinstance(object_looked_at, int) and object_looked_at.interacting:
+        object_looked_at.dialogue.scroll()
+        screen.sprite_surface_scaled.blit(object_looked_at.dialogue.surface, (object_looked_at.pos[0]*TILE_SCALE, object_looked_at.pos[1]*TILE_SCALE))
+
+    
     screen.mode.blit(screen.sprite_surface_scaled, (0,0))
     text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}", True, (0,0,100), (100,0,0))
     screen.mode.blit(text, (0,0))

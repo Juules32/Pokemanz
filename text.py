@@ -7,9 +7,11 @@ from Classes.displays import Screen
 from letter_data import letters, letter_lengths
 
 class Text:
-    def __init__(self, text, posx, posy, surface):
+    def __init__(self, text, posx, posy):
         self.text = text
-        self.bubble = text_box = pygame.image.load("Assets/Dialogue/text_box.png")
+        self.bubble_image = pygame.image.load("Assets/Dialogue/text_box.png")
+        self.bubble = pygame.transform.scale2x(self.bubble_image)
+        self.surface = pygame.Surface(self.bubble.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         self.pos = (posx, posy)
         self.counter = 0
         self.length = len(text)
@@ -17,7 +19,8 @@ class Text:
         self.length = len(self.pairs)
         self.pair_nr = 0
         self.awaiting_press = False
-        self.surface = surface
+        self.finished = False
+        self.pressing = False
     
     def find_pairs(self):
         
@@ -62,70 +65,45 @@ class Text:
             pairs.append(pee)
         return pairs
 
-    def scroll(self, x, y, pressing = False):
-        coefficient = 0
-        if not self.awaiting_press:
-            for i, line in enumerate(self.pairs[self.pair_nr]):
-                x_offset = 0
-                self.surface.blit(self.bubble, (x,y))
-                
-                for word in line:
-                    for letter in word:
-                        if self.counter >= coefficient*FRAMES_PER_LETTER:
-                            self.surface.blit(letters[letter], (x+x_offset,y+i*20))
+    def scroll(self):
+        if not self.finished:
+            coefficient = 0
+            self.surface.blit(self.bubble, (0,0))
+            if not self.awaiting_press:
+                for i, line in enumerate(self.pairs[self.pair_nr]):
+                    x_offset = 0
+                    
+                    for word in line:
+                        for letter in word:
+                            if self.counter >= coefficient*FRAMES_PER_LETTER:
+                                self.surface.blit(letters[letter], (14+x_offset,14+i*20))
+                                x_offset += letter_lengths[letter][0] + 1 #1 is amount of pixels between letters
+                                coefficient += 1
+
+                    #prevents counter going to infinity
+                    if self.counter < coefficient*FRAMES_PER_LETTER*2:
+                        self.counter += 1
+                    else:
+                        self.counter = 0
+                        self.awaiting_press = True
+                        break
+
+            
+            if self.awaiting_press:
+
+                #draw the whole pair
+                for i, line in enumerate(self.pairs[self.pair_nr]):
+                    x_offset = 0
+                    for word in line:
+                        for letter in word:
+                            self.surface.blit(letters[letter], (14+x_offset,14+i*20))
                             x_offset += letter_lengths[letter][0] + 1 #1 is amount of pixels between letters
-                            coefficient += 1
-
-                #prevents counter going to infinity
-                if self.counter < coefficient*FRAMES_PER_LETTER*2:
-                    self.counter += 1
-                else:
-                    self.counter = 0
-                    self.awaiting_press = True
-                    break
-
-        
-        if self.awaiting_press:
-            for i, line in enumerate(self.pairs[self.pair_nr]):
-                x_offset = 0
-                for word in line:
-                    for letter in word:
-                        self.surface.blit(letters[letter], (x_offset,i*20))
-                        x_offset += letter_lengths[letter][0] + 1 #1 is amount of pixels between letters
-                            
-            if pressing:
-                print("pla")
-                self.awaiting_press = False
-                if self.pair_nr + 1 < self.length:
+                                
+                if self.pressing:
+                    self.pressing = False
+                    self.awaiting_press = False
                     self.pair_nr += 1
-                else:
-                    print("done")
+                    print(self.length, self.pair_nr)
 
-
-pygame.init()
-mainClock = pygame.time.Clock()
-
-screen = pygame.display.set_mode(((15*TILE_SCALE, 10*TILE_SCALE)), pygame.RESIZABLE)
-
-a = None
-
-while True:
-    pressing = False
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == KEYDOWN:
-            if event.key == K_z:
-                pressing = True
-                a = Text("Hello! My name is Michael McDingus, and I'll be your trainer", 20, 20, screen)
-
-
-
-    if a != None:
-        a.scroll(pressing, 20, 20)
-        screen_scaled = pygame.transform.scale(a.surface, (15*TILE_SCALE, 10*TILE_SCALE))
-        screen.blit(screen_scaled, (0,0))
-
-    pygame.display.update()
-    mainClock.tick(FRAMERATE)
+                    if self.pair_nr == self.length:
+                        self.finished = True
