@@ -1,6 +1,5 @@
 # 
-# How to scale dialogue properly
-# How to end conversation (applies to real life as well) 
+# ### How to end conversation (applies to real life as well) 
 # Implementér running
 # lav * " og : i pixel art
 # i subclassen ImportantNpc i Npc.py så skal de kunne bevæge sig, være i koreograferede cutscener, etc.
@@ -160,13 +159,15 @@ while True:
 
     screen.sprite_surface_scaled = pygame.transform.scale(screen.sprite_surface, screen.current_dims)
 
-    if not isinstance(object_looked_at, int) and object_looked_at.interacting:
-        object_looked_at.dialogue.scroll()
-        screen.sprite_surface_scaled.blit(object_looked_at.dialogue.surface, (object_looked_at.pos[0]*TILE_SCALE, object_looked_at.pos[1]*TILE_SCALE))
-
+    if not isinstance(object_looked_at, int):
+        if object_looked_at.interacting:
+            object_looked_at.dialogue.scroll()
+            screen.sprite_surface_scaled.blit(object_looked_at.dialogue.get_scaled(), (screen.center[0]*4 - object_looked_at.dialogue.bubble.get_width()*2/2 + player.facing[0]*TILE_SIZE*4 + TILE_SCALE/2, (screen.center[1] - TILE_SIZE*0.5)*4 + player.facing[1]*TILE_SIZE*4 - TILE_SCALE*2))
+        else:
+            object_looked_at.dialogue = None
     
     screen.mode.blit(screen.sprite_surface_scaled, (0,0))
-    text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}", True, (0,0,100), (100,0,0))
+    text = font.render(f"{round(mainClock.get_fps())}, {player.get_pointing()}, {player.facing}", True, (0,0,100), (100,0,0))
     screen.mode.blit(text, (0,0))
 
     pygame.display.update()

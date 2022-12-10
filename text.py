@@ -11,7 +11,7 @@ class Text:
         self.text = text
         self.bubble_image = pygame.image.load("Assets/Dialogue/text_box.png")
         self.bubble = pygame.transform.scale2x(self.bubble_image)
-        self.surface = pygame.Surface(self.bubble.get_size(), pygame.SRCALPHA, 32).convert_alpha()
+        self.surface = pygame.Surface(self.bubble.get_size(), pygame.SRCALPHA, 32).convert_alpha() #transparency
         self.pos = (posx, posy)
         self.counter = 0
         self.length = len(text)
@@ -21,6 +21,9 @@ class Text:
         self.awaiting_press = False
         self.finished = False
         self.pressing = False
+
+    def get_scaled(self):
+        return pygame.transform.scale(self.surface, (self.surface.get_width()*2, self.surface.get_height()*2))
     
     def find_pairs(self):
         
