@@ -1,7 +1,6 @@
-import pygame
+import pygame, json
 from constants import *
 from text import Text
-
 
 #all objects visible somewhere on the world map
 class Entity:
@@ -43,6 +42,9 @@ class Player(Entity):
         #animation variables
         self.count = 0
         self.stance = 0
+
+        self.pos_offset = [self.pos[0]*TILE_SIZE, self.pos[1]*TILE_SIZE]
+
         self.wants_to_interact = False
         self.interacting = False
 
@@ -56,6 +58,41 @@ class Player(Entity):
             self.run_queue.append(dir)
         self.pos[0] += dir[0]
         self.pos[1] += dir[1]
+
+    def load(self):
+        with open(f"Save Data/save_{1}.txt") as save:
+            data = json.load(save)
+            for key, value in data.items():
+                setattr(self, key, value)
+
+    def save(self):
+        with open(f"Save Data/save_{1}.txt", "w") as save:
+            data_to_be_saved = ["location", "pos", "facing", "inventory"]
+            save_data = {}
+            for attr, value in self.__dict__.items():
+                for data in data_to_be_saved:
+                    if data == attr:
+                        save_data[attr] = value
+            json.dump(save_data, save)
+
+    def animate(self):
+        if len(self.run_queue):
+            dir = self.run_queue[0]
+            self.facing = [dir[0], dir[1]]
+            self.pos_offset[0] += dir[0] * WALKING_SPEED
+            self.pos_offset[1] += dir[1] * WALKING_SPEED
+            walking_frames = len(self.run_queue)
+
+            #left foot forward, then right foot etc...
+            if walking_frames % TILE_SIZE == 0:
+                self.count += 1
+                self.stance = self.count % 2 + 1
+            elif walking_frames % TILE_SIZE == 8:
+                self.stance = 0
+            self.run_queue = self.run_queue[WALKING_SPEED:]
+        else:
+            self.count = 0
+            self.stance = 0
 
 
 class Interactable(Entity):
@@ -71,14 +108,17 @@ class Interactable(Entity):
             print("starting dialogue")
             self.dialogue = Text(self.text, self.pos[0]*TILE_SCALE, self.pos[1]*TILE_SCALE)
             self.interacting = True
+            self.dialogue.pressing = True
+        
+        elif self.dialogue.finished_talking:
+            print("finishing dialogue")
+            self.interacting = False
+            self.dialogue = None
+        
         else:
-            if not self.dialogue.finished:
-                print("continuing dialogue")
-                self.dialogue.pressing = True
-            else:
-                print("finishing dialogue")
-                self.interacting = False
-                self.dialogue = None
+            self.dialogue.pressing = True
+        
+                
 
 class Npc(Interactable):
     def __init__(self, id, location, pos, facing, text):
@@ -111,5 +151,4 @@ class Item(Interactable):
 items = {
     "pokeballs": ["pokeball", "great ball", "ultra ball"]
 }
-
 

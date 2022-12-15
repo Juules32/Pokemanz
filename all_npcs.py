@@ -1,4 +1,4 @@
-from Classes.entities import Npc
+from Classes.entity import Npc
 
 all_npcs = [
     Npc("sailor_1", "plains", (5,5), (0,0),
@@ -24,7 +24,7 @@ all_npcs = [
 
     Npc("coolkid_2", "plains", (5,4), (0,0),
     
-    "I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime I have superpowers..! and also i like anime"),
+    "I have superpowers..! and also i like anime I have superpowers..!"),
 
     Npc("goku", "plains", (6,4), (0,0),
     

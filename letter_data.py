@@ -10,6 +10,7 @@ for letter in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!'":
 
 letters["?"] = pygame.image.load("Assets/Letters/question_mark.png")
 letters[" "] = pygame.image.load("Assets/Letters/_.png")
+letters["next"] = pygame.image.load("Assets/Letters/next.png")
 
 
 letter_lengths = {}

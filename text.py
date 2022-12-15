@@ -2,7 +2,7 @@ import time, pygame, sys
 from pygame.locals import *
 
 from constants import *
-from Classes.displays import Screen
+from Classes.screen import Screen
 
 from letter_data import letters, letter_lengths
 
@@ -18,8 +18,8 @@ class Text:
         self.pairs = self.find_pairs()
         self.length = len(self.pairs)
         self.pair_nr = 0
-        self.awaiting_press = False
-        self.finished = False
+        self.finished_animation = False
+        self.finished_talking = False
         self.pressing = False
 
     def get_scaled(self):
@@ -48,7 +48,7 @@ class Text:
             line_count += word_count + letter_lengths[" "][0]
             
             #if line_count is under 180 pixels, adds word to current line
-            if line_count <= 180:
+            if line_count <= 166:
                 current_line.append(word + " ")
 
             #otherwise, current_line is added to lines, and variables are set to current word, since it didn't make it into current_line
@@ -67,12 +67,16 @@ class Text:
                 pee.append(lines[i+1])
             pairs.append(pee)
         return pairs
+        
+
 
     def scroll(self):
-        if not self.finished:
+        if not self.finished_talking:
             coefficient = 0
             self.surface.blit(self.bubble, (0,0))
-            if not self.awaiting_press:
+            if not self.finished_animation:
+                self.pressing = False
+
                 for i, line in enumerate(self.pairs[self.pair_nr]):
                     x_offset = 0
                     
@@ -82,17 +86,20 @@ class Text:
                                 self.surface.blit(letters[letter], (14+x_offset,14+i*20))
                                 x_offset += letter_lengths[letter][0] + 1 #1 is amount of pixels between letters
                                 coefficient += 1
+                            else:
+                                break
 
-                    #prevents counter going to infinity
-                    if self.counter < coefficient*FRAMES_PER_LETTER*2:
-                        self.counter += 1
-                    else:
-                        self.counter = 0
-                        self.awaiting_press = True
-                        break
+                #prevents counter going to infinity
+                if self.counter < coefficient*FRAMES_PER_LETTER:
+                    self.counter += 1
+                else:
 
-            
-            if self.awaiting_press:
+                    #displays this when line finished animating
+                    self.counter = 0
+                    self.finished_animation = True
+                    
+
+            if self.finished_animation:
 
                 #draw the whole pair
                 for i, line in enumerate(self.pairs[self.pair_nr]):
@@ -101,12 +108,17 @@ class Text:
                         for letter in word:
                             self.surface.blit(letters[letter], (14+x_offset,14+i*20))
                             x_offset += letter_lengths[letter][0] + 1 #1 is amount of pixels between letters
-                                
+
+                self.surface.blit(letters["next"], (204,14+20))
+
+                self.checkFinished()
+
                 if self.pressing:
                     self.pressing = False
-                    self.awaiting_press = False
+                    self.finished_animation = False
                     self.pair_nr += 1
                     print(self.length, self.pair_nr)
 
-                    if self.pair_nr == self.length:
-                        self.finished = True
+
+    def checkFinished(self):
+        self.finished_talking = True if self.pair_nr + 1 >= self.length else False

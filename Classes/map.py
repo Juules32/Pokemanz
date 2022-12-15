@@ -46,4 +46,3 @@ class Map:
         return json.load(open(f"Areas/{self.name}/items.txt", "r"))
 
     
-    
